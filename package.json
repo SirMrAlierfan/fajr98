@@ -10,13 +10,20 @@
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.6",
+    "@prisma/client": "^6.13.0",
+    "cookie": "^1.0.2",
+    "dotenv": "^17.2.0",
     "framer-motion": "^12.23.5",
+    "jose": "^6.0.12",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.2",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "prisma": "^6.13.0",
     "tailwindcss": "^4"
   }
 }
