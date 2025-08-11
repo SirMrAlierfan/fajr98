@@ -1,21 +1,26 @@
 // src/app/api/content/route.js
-import db from '@/lib/db';
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
 
 export async function GET(req) {
   try {
-    const { searchParams } = new URL(req.url);
-    const page = searchParams.get("page");
+    const { searchParams } = new URL(req.url)
+    const slug = searchParams.get("page")
 
-    if (!page) return Response.json({ error: "Missing page param" }, { status: 400 });
+    if (!slug) {
+      return Response.json({ error: "پارامتر page الزامی است" }, { status: 400 })
+    }
 
-    const [rows] = await db.execute(
-      "SELECT * FROM contents WHERE page_name = ? ORDER BY date DESC LIMIT 1",
-      [page]
-    );
+    const page = await prisma.page.findUnique({
+      where: { slug },
+      include: { contents: { orderBy: { order: 'asc' } } }
+    })
 
-    return Response.json(rows[0] || {});
+    if (!page) return Response.json({}, { status: 404 })
+
+    return Response.json(page)
   } catch (err) {
-    console.error("❌ API Error:", err);
-    return Response.json({ error: "Server error" }, { status: 500 });
+    console.error("❌ API Error:", err)
+    return Response.json({ error: "Server error" }, { status: 500 })
   }
 }

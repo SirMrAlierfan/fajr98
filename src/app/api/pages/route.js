@@ -1,4 +1,6 @@
-import db from '@/lib/db'
+// src/app/api/pages/route.js
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
 
 export async function POST(req) {
   try {
@@ -8,12 +10,25 @@ export async function POST(req) {
       return Response.json({ message: 'slug و content الزامی هستند.' }, { status: 400 })
     }
 
-    await db.execute(
-      `INSERT INTO pages (slug, title, content)
-       VALUES (?, ?, ?)
-       ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content)`,
-      [slug, title, content]
-    )
+    // ذخیره یا آپدیت صفحه
+    const page = await prisma.page.upsert({
+      where: { slug },
+      update: { title },
+      create: { slug, title }
+    })
+
+    // حذف محتوای قبلی و ذخیره محتوای جدید
+    await prisma.pageContent.deleteMany({ where: { pageId: page.id } })
+
+    const parsedContent = typeof content === 'string' ? JSON.parse(content) : content
+    await prisma.pageContent.createMany({
+      data: parsedContent.map((block, index) => ({
+        type: block.type,
+        content: block.value,
+        order: index,
+        pageId: page.id
+      }))
+    })
 
     return Response.json({ message: 'صفحه ذخیره شد.' })
   } catch (err) {
