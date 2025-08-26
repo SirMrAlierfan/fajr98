@@ -1,31 +1,29 @@
-import { headers } from 'next/headers';
-import { jwtVerify } from 'jose';
-import { redirect } from 'next/navigation';
-import { parse } from 'cookie';
+'use client';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import AdminLayout from '@/components/admin/AdminLayout';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 
+export default function AdminRoot() {
+  const [ok, setOk] = useState(null);
+  const router = useRouter();
 
-export default async function AdminPage() {
-  const headerList = await headers();
-  const rawCookie = headerList.get('cookie') || '';
-  const cookies = parse(rawCookie);
-  const token = cookies.admin_token;
+  useEffect(() => {
+    fetch('/api/admin/auth-check', { credentials: 'include' })
+      .then(r => {
+        if (r.ok) return setOk(true);
+        throw new Error('unauth');
+      })
+      .catch(() => {
+        router.push('/admin/login');
+      });
+  }, [router]);
 
-  if (!token) {
-    redirect('/admin/login');
-  }
+  if (ok === null) return <div className="p-6">در حال بررسی دسترسی...</div>;
 
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
-
-    if (payload.role !== 'admin') {
-      redirect('/admin/login');
-    }
-
-    return <AdminDashboard />; // نمایش پنل ادمین واقعی
-  } catch (err) {
-    console.error('❌ JWT verify failed:', err);
-    redirect('/admin/login');
-  }
+  return (
+    <AdminLayout>
+      <AdminDashboard />
+    </AdminLayout>
+  );
 }

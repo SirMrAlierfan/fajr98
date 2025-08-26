@@ -1,35 +1,39 @@
-'use client';
+import React, { useState } from "react";
+import GeneralAdminPanel from "./GeneralAdminPanel";
+import { BASE_PAGES, BASE_MAJORS } from "@/lib/adminApi";
 
-import { useState } from 'react';
-import GeneralAdminPanel from './AdminPanel';
-import MajorsAdminPanel from './majors';
+export default function AdminDashboard({ isAdmin = true }) {
+  // 📌 تعریف پنل‌ها همراه با apiBaseUrl و collectionKey
+  const panels = [
+    { key: "general", title: "صفحات عمومی", apiBase: BASE_PAGES, collectionKey: "pages" },
+    { key: "majors", title: "معرفی رشته‌ها", apiBase: BASE_MAJORS, collectionKey: "major" },
+  ];
 
-export default function AdminDashboard() {
-  const [mode, setMode] = useState('general');
+  const [mode, setMode] = useState(panels[0].key);
+  const active = panels.find((p) => p.key === mode) || panels[0];
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-center">پنل مدیریت</h1>
-
-      {/* سوییچر نوع پنل */}
-      <div className="flex justify-center gap-4 mb-6">
-        <button
-          onClick={() => setMode('general')}
-          className={`py-2 px-4 rounded ${mode === 'general' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-        >
-          صفحات عمومی
-        </button>
-        <button
-          onClick={() => setMode('interduction')}
-          className={`py-2 px-4 rounded ${mode === 'interduction' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-        >
-          معرفی رشته‌ها
-        </button>
+    <div>
+      <div className="flex gap-3 mb-6">
+        {panels.map((p) => (
+          <button
+            key={p.key}
+            className={`px-3 py-1 rounded ${
+              mode === p.key ? "bg-blue-600 text-white" : "bg-gray-100"
+            }`}
+            onClick={() => setMode(p.key)}
+          >
+            {p.title}
+          </button>
+        ))}
       </div>
 
-      {/* نمایش پنل مناسب */}
-      {mode === 'general' && <GeneralAdminPanel />}
-      {mode === 'interduction' && <MajorsAdminPanel />}
+      {/* 📌 حالا collectionKey هم پاس داده میشه */}
+      <GeneralAdminPanel
+        apiBaseUrl={active.apiBase}
+        collectionKey={active.collectionKey}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

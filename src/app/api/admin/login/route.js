@@ -8,7 +8,7 @@ export async function POST(req) {
   const secret = process.env.JWT_SECRET;
 
   if (password === validPassword) {
-    const token = jwt.sign({ role: 'admin' }, secret, { expiresIn: '1h' });
+    const token = jwt.sign({ role: 'admin' }, secret, { expiresIn: '1000h' });
 
     const cookie = serialize('admin_token', token, {
       httpOnly: true,
