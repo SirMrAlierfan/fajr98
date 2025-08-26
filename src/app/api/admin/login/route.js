@@ -13,7 +13,7 @@ export async function POST(req) {
     const cookie = serialize('admin_token', token, {
       httpOnly: true,
       path: '/',
-      maxAge: 60 * 60,
+      maxAge: 60 * 60 * 4,
     });
 
     return new Response(JSON.stringify({ success: true }), {

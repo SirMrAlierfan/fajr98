@@ -1,110 +1,122 @@
 // src/lib/adminApi.js
 
-// 📌 پایگاه API برای صفحات
-export const BASE_PAGES =
-  process.env.BASE_PAGES ||
-  "https://68a5f7fd2a3deed2960f7ee9.mockapi.io";
-
-// 📌 پایگاه API برای رشته‌ها
-export const BASE_MAJORS =
-  process.env.BASE_MAJORS ||
-  "https://687cd574918b642243300b2e.mockapi.io/api/links";
+// ==================== Base URLs ====================
+// مقدار اینها از .env میاد
+export const BASE_PAGES = process.env.NEXT_PUBLIC_BASE_PAGES;
+export const BASE_MAJORS = process.env.NEXT_PUBLIC_BASE_MAJORS;
 
 // ==================== ابزار مشترک ====================
 async function handleRes(res, errorMsg) {
-  if (!res.ok) throw new Error(errorMsg);
-  return res.json();
+  // تلاش می‌کنیم پاسخ JSON رو پارس کنیم؛ اگر پاسخ 204 باشه یا JSON نبود، مناسب هندل می‌کنیم
+  if (!res.ok) {
+    // سعی کنیم ارور سرور رو بخونیم (اگر JSON باشه)
+    let errText = errorMsg;
+    try {
+      const j = await res.json();
+      if (j && j.error) errText = j.error;
+      else if (j && j.message) errText = j.message;
+    } catch (_) {
+      // ignore
+    }
+    throw new Error(errText);
+  }
+
+  // اگر پاسخ بدون بدنه باشه
+  if (res.status === 204) return null;
+
+  // سعی به خواندن JSON
+  try {
+    return await res.json();
+  } catch (e) {
+    // اگر JSON نبود برگرد متن خام
+    try {
+      return await res.text();
+    } catch {
+      return null;
+    }
+  }
 }
 
-// ==================== Pages ====================
+// ==================== Base map ====================
+const BASES = {
+  pages: BASE_PAGES,
+  majors: BASE_MAJORS,
+};
 
-// لیست صفحات
-export async function listPages() {
-  const res = await fetch(`${BASE_PAGES}/pages`, { cache: "no-store" });
-  return handleRes(res, "خطا در دریافت لیست صفحات");
+// helper داخلی برای ساختن آدرس کامل
+function baseFor(type) {
+  const base = BASES[type];
+  if (!base) throw new Error(`نوع ناشناخته یا آدرس پایه تنظیم نشده: ${type}`);
+  return base.replace(/\/+$/, ""); // بدون اسلش انتهایی
 }
 
-// دریافت یک صفحه بر اساس slug
-export async function getPage(slug) {
+// ==================== CRUD عمومی ====================
+
+// دریافت لیست آیتم‌ها
+export async function listItems(type) {
+  const base = baseFor(type);
+  const res = await fetch(`${base}/${type}`, { cache: "no-store" });
+  return handleRes(res, `خطا در دریافت لیست ${type}`);
+}
+
+// دریافت یک آیتم بر اساس slug
+export async function getItem(type, slug) {
   if (!slug) throw new Error("slug لازم است");
-  const res = await fetch(
-    `${BASE_PAGES}/pages?slug=${encodeURIComponent(slug)}`,
-    { cache: "no-store" }
-  );
-  const data = await handleRes(res, "خطا در بارگذاری صفحه");
-  return data.length > 0 ? data[0] : null;
+  const base = baseFor(type);
+  // query by slug
+  const res = await fetch(`${base}/${type}?slug=${encodeURIComponent(slug)}`, { cache: "no-store" });
+  const data = await handleRes(res, `خطا در بارگذاری ${type}`);
+  return Array.isArray(data) ? (data.length > 0 ? data[0] : null) : data;
 }
 
-// ذخیره یا آپدیت صفحه
-export async function savePage(data) {
+// ایجاد یا آپدیت آیتم
+export async function saveItem(type, data) {
   if (!data) throw new Error("داده‌ای برای ذخیره وجود ندارد");
+  const base = baseFor(type);
 
   if (data.id) {
     // آپدیت
-    const res = await fetch(`${BASE_PAGES}/pages/${data.id}`, {
+    const res = await fetch(`${base}/${type}/${data.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    return handleRes(res, "خطا در ذخیره صفحه");
+    return handleRes(res, `خطا در ذخیره ${type}`);
   } else {
     // ایجاد جدید
-    const res = await fetch(`${BASE_PAGES}/pages`, {
+    const res = await fetch(`${base}/${type}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    return handleRes(res, "خطا در ایجاد صفحه");
+    return handleRes(res, `خطا در ایجاد ${type}`);
   }
 }
 
-// حذف صفحه
-export async function deletePage(id) {
+// حذف آیتم
+export async function deleteItem(type, id) {
   if (!id) throw new Error("id لازم است");
-  const res = await fetch(`${BASE_PAGES}/pages/${id}`, { method: "DELETE" });
-  return handleRes(res, "خطا در حذف صفحه");
+  const base = baseFor(type);
+  const res = await fetch(`${base}/${type}/${id}`, { method: "DELETE" });
+  return handleRes(res, `خطا در حذف ${type}`);
 }
 
-// ==================== Majors ====================
+// ==================== Backwards-compatible wrappers ====================
+// (برای اینکه لازم نباشه بقیهٔ سورس رو تغییر بدی)
 
-// لیست رشته‌ها
-export async function listMajors() {
-  const res = await fetch(`${BASE_MAJORS}/majors`, { cache: "no-store" });
-  return handleRes(res, "خطا در دریافت لیست رشته‌ها");
-}
+export const listPages = () => listItems("pages");
+export const listMajors = () => listItems("majors");
 
-// ذخیره یا آپدیت رشته
-export async function saveMajor(data) {
-  if (!data) throw new Error("داده‌ای برای ذخیره وجود ندارد");
+export const getPage = (slug) => getItem("pages", slug);
+export const getMajor = (slug) => getItem("majors", slug);
 
-  if (data.id) {
-    // آپدیت
-    const res = await fetch(`${BASE_MAJORS}/majors/${data.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    return handleRes(res, "خطا در ذخیره رشته");
-  } else {
-    // ایجاد جدید
-    const res = await fetch(`${BASE_MAJORS}/majors`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    return handleRes(res, "خطا در ایجاد رشته");
-  }
-}
+export const savePage = (data) => saveItem("pages", data);
+export const saveMajor = (data) => saveItem("majors", data);
 
-// حذف رشته
-export async function deleteMajor(id) {
-  if (!id) throw new Error("id لازم است");
-  const res = await fetch(`${BASE_MAJORS}/majors/${id}`, { method: "DELETE" });
-  return handleRes(res, "خطا در حذف رشته");
-}
-// ==================== Admin ====================
+export const deletePage = (id) => deleteItem("pages", id);
+export const deleteMajor = (id) => deleteItem("majors", id);
 
-// لاگین
+// ==================== Admin (login) ====================
 export async function login(password) {
   if (!password) throw new Error("رمز عبور لازم است");
 
@@ -121,3 +133,12 @@ export async function login(password) {
 
   return res.json();
 }
+
+/**
+ * استفاده:
+ * const page = await getItem("pages", "my-slug");
+ * const major = await getItem("majors", "cs");
+ *
+ * یا با wrapper قدیمی:
+ * const page = await getPage("my-slug");
+ */

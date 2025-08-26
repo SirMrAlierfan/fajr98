@@ -24,6 +24,20 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
   const [previewMode, setPreviewMode] = useState('desktop');
+// وقتی کالکشن یا apiBaseUrl تغییر کرد، همه‌چی ریست شه
+useEffect(() => {
+  setPages([]);
+  setForm(emptyForm);
+  setSelectedId(null);
+  setPreviewMode("desktop");
+  setLoading(false);
+  setLoadingList(true);
+
+  listPagesReq()
+    .then(setPages)
+    .catch((err) => console.error(err))
+    .finally(() => setLoadingList(false));
+}, [apiBaseUrl, collectionKey]);
 
   
   async function getPageReq(slug) {
@@ -58,7 +72,7 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
       .catch((err) => console.error(err))
       .finally(() => setLoadingList(false));
   }, [apiBaseUrl, collectionKey]);
-     
+
   async function savePageReq(page) {
     if (!isAdmin) throw new Error('دسترسی ندارید');
     const { base, key } = ensureApi();
@@ -253,9 +267,8 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
                 <div
                   key={p.id || p.slug}
                   onClick={() => p.slug && loadPage(p.slug)}
-                  className={`flex items-center justify-between p-2 rounded-lg cursor-pointer ${
-                    selectedId === p.id ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center justify-between p-2 rounded-lg cursor-pointer ${selectedId === p.id ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-50'
+                    }`}
                 >
                   <div className="truncate">
                     <button
@@ -372,7 +385,7 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
 
             {isAdmin && (
               <div className="pt-2">
-                <div className="flex flex-wrap gap-2 mb-2">
+               <div className="flex flex-wrap gap-2 my-5">
                   <button type="button" onClick={() => addBlock('title')} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">عنوان</button>
                   <button type="button" onClick={() => addBlock('text')} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">متن</button>
                   <button type="button" onClick={() => addBlock('image')} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">عکس</button>
@@ -381,6 +394,14 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
                   <button type="button" onClick={() => addBlock('embed')} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">Embed</button>
                   <button type="button" onClick={() => addBlock('link')} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">لینک</button>
                   <button type="button" onClick={() => addBlock('html')} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">HTML</button>
+                  <button
+                    type="button"
+                    onClick={() => addBlock('capacity')}
+                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm"
+                  >
+                    ظرفیت
+                  </button>
+
                 </div>
 
                 <div className="space-y-3">
@@ -414,12 +435,52 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
                           </div>
                         )}
 
-                        {b.type === 'gallery' && (
-                          <div className="space-y-2">
-                            <p className="text-xs text-gray-500">هر خط یک آدرس تصویر</p>
-                            <textarea value={(b.value || []).join('\n')} onChange={(e) => updateBlock(i, { value: e.target.value.split('\n').map((s) => s.trim()).filter(Boolean) })} className="w-full p-2 border rounded" rows={4} />
+                        {/* === Block: Gallery === */}
+                        {b.type === "gallery" && (
+                          <div className="p-4 border rounded mb-4 bg-gray-50">
+                            <h4 className="font-bold mb-2">📷 گالری تصاویر</h4>
+                            {(b.value || []).map((img, j) => (
+                              <div key={j} className="flex items-center gap-2 mb-2">
+                                <input
+                                  type="text"
+                                  value={img}
+                                  onChange={(e) => {
+                                    const newBlocks = [...form.blocks];
+                                    newBlocks[i].value[j] = e.target.value;
+                                    setForm({ ...form, blocks: newBlocks });
+                                  }}
+                                  placeholder={`آدرس تصویر ${j + 1}`}
+                                  className="flex-1 border rounded px-2 py-1"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newBlocks = [...form.blocks];
+                                    newBlocks[i].value.splice(j, 1);
+                                    setForm({ ...form, blocks: newBlocks });
+                                  }}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  حذف
+                                </button>
+                              </div>
+                            ))}
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newBlocks = [...form.blocks];
+                                if (!Array.isArray(newBlocks[i].value)) newBlocks[i].value = [];
+                                newBlocks[i].value.push("");
+                                setForm({ ...form, blocks: newBlocks });
+                              }}
+                              className="px-3 py-1 bg-blue-500 text-white rounded mt-2"
+                            >
+                              ➕ افزودن عکس
+                            </button>
                           </div>
                         )}
+
 
                         {b.type === 'video' && (
                           <input placeholder="آدرس ویدئو" value={b.value} onChange={(e) => updateBlock(i, { value: e.target.value })} className="w-full p-2 border rounded" />
@@ -453,6 +514,37 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
                             />
                           </div>
                         )}
+                        {b.type === 'capacity' && (
+                          <div className="space-y-2">
+                            <input
+                              type="number"
+                              placeholder="ظرفیت پر شده (مثلا 27)"
+                              value={b.value?.current || ''}
+                              onChange={(e) =>
+                                updateBlock(i, { value: { ...(b.value || {}), current: e.target.value } })
+                              }
+                              className="w-full p-2 border rounded"
+                            />
+                            <input
+                              type="number"
+                              placeholder="کل ظرفیت (مثلا 33)"
+                              value={b.value?.total || ''}
+                              onChange={(e) =>
+                                updateBlock(i, { value: { ...(b.value || {}), total: e.target.value } })
+                              }
+                              className="w-full p-2 border rounded"
+                            />
+                            <input
+                              placeholder="متن توضیحی (اختیاری)"
+                              value={b.value?.label || ''}
+                              onChange={(e) =>
+                                updateBlock(i, { value: { ...(b.value || {}), label: e.target.value } })
+                              }
+                              className="w-full p-2 border rounded"
+                            />
+                          </div>
+                        )}
+
 
                         {b.type === 'html' && (
                           <textarea value={b.value} onChange={(e) => updateBlock(i, { value: e.target.value })} className="w-full p-2 border rounded" rows={5} />
@@ -461,6 +553,7 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
                     </div>
                   ))}
                 </div>
+                 
               </div>
             )}
 
@@ -540,6 +633,18 @@ export default function GeneralAdminPanel({ apiBaseUrl = '', collectionKey = 'pa
                             <iframe src={b.value} className="w-full h-full" title={`embed-${i}`} />
                           </div>
                         );
+                      if (type === 'capacity') {
+                        const val = b.value || {};
+                        return (
+                          <div key={i} className="p-3 border rounded bg-gray-50 text-center">
+                            <div className="text-sm text-gray-600">{val.label || 'ظرفیت'}</div>
+                            <div className="text-lg font-bold text-indigo-600">
+                              {val.current || 0}/{val.total || 0}
+                            </div>
+                          </div>
+                        );
+                      }
+
                       if (type === 'link')
                         return (
                           <div key={i}>

@@ -1,6 +1,14 @@
+/**
+ * src/app/majors/[slug]/page.jsx
+ *
+ * Server component for "majors" (mirror of src/app/[slug]/page.jsx)
+ * - No "use client"
+ * - No interactive handlers (onClick/onSubmit/etc)
+ * - Same styling, blocks, TOC, gallery, JSON-LD and metadata logic
+ */
 
 import React from "react";
-import { getPage } from "@/lib/adminApi";
+import { getItem } from "@/lib/adminApi"; // unified API: getItem("majors", slug)
 import GallerySlider from "@/components/GallerySlider";
 
 /* ========================= Utilities ========================= */
@@ -117,7 +125,6 @@ function toPersianDate(dateLike) {
 }
 
 /* ========================= Global CSS ========================= */
-/* Includes: remove horizontal scroll, gallery styles, lightbox, theme polish */
 function GlobalStyles() {
   const css = `
   :root{
@@ -131,10 +138,8 @@ function GlobalStyles() {
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; background:var(--bg); font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
   img{ max-width:100%; height:auto; display:block; }
-  /* Prevent horizontal scroll */
   body, #__next { overflow-x:hidden; }
 
-  /* soft page wrapper */
   .soft-bg { position:relative; }
   .soft-bg::before{
     content:"";
@@ -146,42 +151,34 @@ function GlobalStyles() {
     z-index:-1;
   }
 
-  /* Cards/glass */
   .card { background: var(--card); border-radius:18px; box-shadow: 0 18px 50px rgba(2,6,23,.06); }
   .glass { background: rgba(255,255,255,.72); backdrop-filter: blur(6px) saturate(1.05); border-radius:14px; box-shadow: 0 10px 30px rgba(2,6,23,.04); }
 
-  /* Head separator */
   .head-sep { position:relative; padding-bottom:.35rem; }
   .head-sep::after{ content:""; position:absolute; left:0; bottom:0; width:72px; height:3px; border-radius:2px; background: linear-gradient(90deg,var(--accentA),var(--accentB)); }
 
-  /* Prose */
   .prose { color:#0f172a; line-height:1.7; }
   .prose h2, .prose h3 { scroll-margin-top:120px; }
   .prose img{ border-radius:12px; box-shadow: 0 8px 30px rgba(2,6,23,.06); }
 
-  /* Gallery (centered, large) */
   .gallery-wrap { width:100%; display:flex; justify-content:center; margin:2rem 0; }
   .gallery-grid { width:100%; max-width:1100px; display:grid; gap:1rem; grid-template-columns: repeat(12, 1fr); }
   .gallery-item { grid-column: span 4; border-radius:12px; overflow:hidden; height: 360px; object-fit:cover; }
   @media (max-width: 1024px) { .gallery-item { grid-column: span 6; height: 280px; } .gallery-grid { max-width:900px; } }
   @media (max-width: 640px) { .gallery-item { grid-column: span 12; height: 220px; } .gallery-grid { max-width:520px; } }
 
-  /* Lightbox */
   .lb-modal { position:fixed; inset:0; background: rgba(2,6,23,.85); display:none; opacity:0; transition:opacity .12s ease; z-index:90; }
   .lb-modal:target { display:block; opacity:1; }
   .lb-backdrop{ position:absolute; inset:0; display:block; }
   .lb-content{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); max-width:94vw; max-height:92vh; border-radius:12px; overflow:hidden; background:#000; }
   .lb-img{ max-width:94vw; max-height:92vh; display:block; }
 
-  /* TOC */
   .toc { position:sticky; top:6rem; }
   .toc .item { display:flex; gap:.6rem; align-items:center; padding:.45rem .5rem; border-radius:8px; transition: background .12s ease; }
   .toc .item:hover { background: rgba(59,130,246,.06); }
 
-  /* small text */
   .muted { color: var(--muted); font-size: .95rem; }
 
-  /* print */
   @media print {
     .no-print { display:none !important; }
     .prose { color:#000; }
@@ -226,8 +223,7 @@ function MetaBar({ slug, stats }) {
   return (
     <div className="px-6 md:px-12 -mt-6 relative z-10">
       <div className="glass px-4 py-2 rounded-full inline-flex items-center gap-4">
-        <span className="muted">/{slug}</span>
-        {/* reading time - simple text only */}
+        <span className="muted">/majors/{slug}</span>
         {stats?.mins ? <span className="muted">{stats.mins} دقیقه مطالعه</span> : null}
       </div>
     </div>
@@ -243,6 +239,8 @@ function Breadcrumb({ slug }) {
       <ol style={{ display: 'flex', gap: '8px', color: '#64748b', fontSize: '.95rem' }}>
         <li>خانه</li>
         <li>/</li>
+        <li>رشته‌ها</li>
+        <li>/</li>
         {segs.map((s, i) => (
           <React.Fragment key={`${s}-${i}`}>
             <li style={{ color: i === segs.length - 1 ? '#0f172a' : '#64748b' }}>{s}</li>
@@ -256,16 +254,10 @@ function Breadcrumb({ slug }) {
 
 /* ======================= Blocks (render many types) ======================= */
 
-/** Render raw HTML safely (server-side) **/
 function HtmlDanger({ html }) {
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-/**
- * Block renderer
- * - galleries: only firstGalleryIndex will render (controlled by parent)
- * - images keep lightbox anchors (internal # ids)
- */
 function Block({ b, i, pageTitle, galleryPrefix, renderGallery }) {
   const type = (b?.type || "text").toLowerCase();
 
@@ -303,11 +295,9 @@ function Block({ b, i, pageTitle, galleryPrefix, renderGallery }) {
     );
   }
 
-if (type === "gallery" && Array.isArray(b.value)) {
-  return <GallerySlider key={i} images={b.value} />;
-}
-
-
+  if (type === "gallery" && Array.isArray(b.value)) {
+    return <GallerySlider key={i} images={b.value} />;
+  }
 
   if (type === "video") {
     const v = String(b.value || "");
@@ -340,7 +330,6 @@ if (type === "gallery" && Array.isArray(b.value)) {
     );
   }
 
-
   if (type === "embed") {
     return (
       <div className="my-6" style={{ aspectRatio: '16/9' }}>
@@ -348,6 +337,7 @@ if (type === "gallery" && Array.isArray(b.value)) {
       </div>
     );
   }
+
   if (type === "capacity") {
     const val = b.value || {};
     const current = parseInt(val.current || 0, 10);
@@ -370,11 +360,9 @@ if (type === "gallery" && Array.isArray(b.value)) {
     );
   }
 
-
   if (type === "link") {
     const url = typeof b.value === "string" ? b.value : b.value?.url;
     const text = typeof b.value === "string" ? b.value : b.value?.text || b.value?.url;
-    // link comes from content - allowed
     return (
       <div className="my-4 card p-3">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -394,7 +382,6 @@ if (type === "gallery" && Array.isArray(b.value)) {
     );
   }
 
-  // fallback: show raw
   return (
     <pre className="my-4" style={{ background: '#f8fafc', padding: 12, borderRadius: 8, color: '#0f172a', overflowX: 'auto' }}>
       {JSON.stringify(b, null, 2)}
@@ -404,7 +391,6 @@ if (type === "gallery" && Array.isArray(b.value)) {
 
 /* ========================= Content renderer & TOC ========================= */
 
-/** Table of Contents (anchors to headings) */
 function TableOfContents({ blocks = [] }) {
   const items = (blocks || [])
     .map((b, idx) => ({ b, idx }))
@@ -430,31 +416,27 @@ function TableOfContents({ blocks = [] }) {
   );
 }
 
-/** Content area: determines first gallery index and renders blocks accordingly */
 function ContentRenderer({ page }) {
   const blocks = page?.blocks || [];
   const firstGalleryIndex = (blocks || []).findIndex(b => (b?.type || "").toLowerCase() === "gallery");
   return (
     <div className="px-6 md:px-12 pb-12 pt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
       <div className="lg:col-span-8">
-        {/* main content */}
         <div className="prose">
           {page.content ? <HtmlDanger html={String(page.content)} /> : null}
         </div>
 
-        {/* blocks */}
         {(blocks || []).map((b, i) => (
           <Block
             key={b?.id || i}
             b={b}
             i={i}
             pageTitle={page.title}
-            galleryPrefix={page.slug || "page"}
+            galleryPrefix={page.slug || "major"}
             renderGallery={i === firstGalleryIndex}
           />
         ))}
 
-        {/* Persian date at bottom */}
         <div style={{ borderTop: '1px solid rgba(15,23,42,.06)', marginTop: 28, paddingTop: 12 }}>
           <div className="muted">تاریخ انتشار: <strong>{toPersianDate(page.publishedAt)}</strong></div>
         </div>
@@ -462,7 +444,6 @@ function ContentRenderer({ page }) {
 
       <div className="lg:col-span-4">
         <TableOfContents blocks={blocks} />
-        {/* no info card in sidebar per request */}
       </div>
     </div>
   );
@@ -473,13 +454,13 @@ function ContentRenderer({ page }) {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   try {
-    const page = await getPage(slug);
-    if (!page) {
-      return { title: "صفحه پیدا نشد", description: "این صفحه موجود نیست." };
+    const major = await getItem("majors", slug);
+    if (!major) {
+      return { title: "رشته پیدا نشد", description: "این رشته موجود نیست." };
     }
-    const cover = getFirstImage(page.blocks || []) || page.cover || page.image || null;
-    const title = page.title || slug;
-    const description = clamp(page.excerpt || page.content || "", 160);
+    const cover = getFirstImage(major.blocks || []) || major.cover || major.image || null;
+    const title = major.title || slug;
+    const description = clamp(major.excerpt || major.content || "", 160);
     return {
       title,
       description,
@@ -496,12 +477,12 @@ export async function generateMetadata({ params }) {
         images: cover ? [cover] : undefined,
       },
       alternates: {
-        canonical: `/${page.slug || slug}`,
+        canonical: `/majors/${major.slug || slug}`,
       },
     };
   } catch (err) {
-    console.error("generateMetadata error:", err);
-    return { title: "صفحه", description: "خطا در بارگذاری اطلاعات متا." };
+    console.error("generateMetadata (majors) error:", err);
+    return { title: "رشته", description: "خطا در بارگذاری اطلاعات متا." };
   }
 }
 
@@ -514,7 +495,7 @@ function JsonLd({ page }) {
     description: page.excerpt || "",
     datePublished: page.publishedAt || undefined,
     image: image ? [image] : undefined,
-    mainEntityOfPage: { "@type": "WebPage", "@id": `/${page.slug || ""}` },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `/majors/${page.slug || ""}` },
     author: page.author ? { "@type": "Person", name: page.author } : undefined,
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
@@ -524,14 +505,15 @@ function JsonLd({ page }) {
 
 export const revalidate = 0;
 
-export default async function Page({ params }) {
+export default async function MajorPage({ params }) {
   const { slug } = await params;
 
   let page = null;
   try {
-    page = await getPage(slug);
+    // using unified adminApi getItem for majors
+    page = await getItem("majors", slug);
   } catch (err) {
-    console.error("Error fetching page:", err);
+    console.error("Error fetching major:", err);
     page = null;
   }
 
@@ -539,8 +521,8 @@ export default async function Page({ params }) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-8">
         <div className="text-center">
-          <h2 style={{ color: '#dc2626', fontSize: '1.5rem', fontWeight: 700 }}>صفحه پیدا نشد</h2>
-          <p className="muted">ممکن است آدرس اشتباه باشد یا صفحه حذف شده باشد.</p>
+          <h2 style={{ color: '#dc2626', fontSize: '1.5rem', fontWeight: 700 }}>رشته پیدا نشد</h2>
+          <p className="muted">ممکن است آدرس اشتباه باشد یا این رشته حذف شده باشد.</p>
         </div>
       </div>
     );
