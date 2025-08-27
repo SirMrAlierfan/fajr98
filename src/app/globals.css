@@ -26,5 +26,32 @@ body {
 body {
   background: var(--background);
   color: var(--foreground);
-  
+    background-color: #000;
+}
+/* +++ اضافه‌شده برای رفع مشکل هِرو در موبایل +++ */
+.hero-bg {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* اجازه میدیم در دسکتاپ fixed باشه ولی در موبایل اسکرول باشه */
+  background-attachment: fixed;
+  min-height: 12rem;
+  width: 100%;
+}
+
+/* موبایل: غیرفعال کردن fixed (باعث رندر سیاه میشه در بعضی مرورگرها) */
+@media (max-width: 768px) {
+  .hero-bg {
+    background-attachment: scroll;
+    min-height: 10rem;
+    background-position: center center;
+  }
+}
+
+/* iframe / embed fallback background (prevent black box while loading) */
+.embed-placeholder {
+  background: linear-gradient(180deg, #f3f4f6 0%, #e6eef8 100%);
+  display: block;
+  width: 100%;
+  height: 100%;
 }

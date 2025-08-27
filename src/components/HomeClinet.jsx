@@ -26,7 +26,7 @@ export default function HomeClient({ pages, majors }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
+        className="text-center py-16 bg-gradient-to-r from-indigo-300 to-purple-900 text-white rounded-2xl"
       >
         <h1 className="text-4xl md:text-5xl font-bold">هنرستان فنی فجر</h1>
         <p className="mt-4 text-lg text-indigo-100">
@@ -45,7 +45,7 @@ export default function HomeClient({ pages, majors }) {
 
       {/* 📄 صفحات */}
       <section className="space-y-10 px-6">
-        <h2 className="text-3xl font-bold text-center">صفحات عمومی</h2>
+        <h2 className="text-3xl font-bold text-center text-white">صفحات عمومی</h2>
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
           {pages.map((p, i) => (
             <motion.a
@@ -88,7 +88,7 @@ export default function HomeClient({ pages, majors }) {
 
       {/* 🎓 رشته‌ها */}
       <section className="space-y-10 px-6">
-        <h2 className="text-3xl font-bold text-center">رشته‌ها</h2>
+        <h2 className="text-3xl font-bold text-center text-white">رشته‌ها</h2>
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {majors.map((m, i) => (
             <motion.a

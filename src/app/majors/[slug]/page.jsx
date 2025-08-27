@@ -202,20 +202,36 @@ function CoverHero({ cover, title, excerpt }) {
   }
 
   return (
-    <header className="relative h-[26rem] md:h-[34rem] w-full overflow-hidden">
-      <div className="absolute inset-0" style={{ backgroundImage: `url(${cover})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }} aria-hidden />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-      <div className="relative z-10 h-full flex items-end p-8 md:p-12">
-        <div className="max-w-5xl">
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg leading-tight head-sep">{title}</h1>
-          {excerpt ? <p className="mt-3 text-white/90 max-w-2xl">{excerpt}</p> : null}
-        </div>
+  <header className="relative h-[26rem] md:h-[34rem] w-full overflow-hidden">
+    {/* background: use class so media-query handles background-attachment */}
+    <div
+      className="absolute inset-0 hero-bg"
+      style={{ backgroundImage: `url(${cover})` }}
+      aria-hidden
+    />
+    {/* mobile fallback: an <img> ensures no black flash if background-image fails */}
+    <img
+      src={cover}
+      alt=""
+      className="absolute inset-0 w-full h-full object-cover md:hidden"
+      aria-hidden
+      loading="lazy"
+    />
+
+    {/* overlay */}
+    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+    <div className="relative z-10 h-full flex items-end p-8 md:p-12">
+      <div className="max-w-5xl">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg leading-tight head-sep">{title}</h1>
+        {excerpt ? <p className="mt-3 text-white/90 max-w-2xl">{excerpt}</p> : null}
       </div>
-      <div className="absolute -bottom-2 left-0 right-0 pointer-events-none">
-        <svg viewBox="0 0 1440 60" className="w-full h-12" preserveAspectRatio="none"><path d="M0,30 C360,90 1080,-30 1440,30 L1440,60 L0,60 Z" fill="white" /></svg>
-      </div>
-    </header>
-  );
+    </div>
+    <div className="absolute -bottom-2 left-0 right-0 pointer-events-none">
+      <svg viewBox="0 0 1440 60" className="w-full h-12" preserveAspectRatio="none"><path d="M0,30 C360,90 1080,-30 1440,30 L1440,60 L0,60 Z" fill="white" /></svg>
+    </div>
+  </header>
+);
+
 }
 
 /** Meta bar: show slug and only reading minutes (plain) **/
