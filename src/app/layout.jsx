@@ -140,31 +140,53 @@ export default function RootLayout({ children }) {
 
           {/* منو موبایل */}
           <AnimatePresence>
-            {menuOpen && (
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ duration: 0.3 }}
-                className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-5 space-y-6 rounded-l-lg"
-              >
-                <button
-                  className="text-gray-600 absolute top-4 left-4"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <nav className="pt-12 flex flex-col space-y-4 text-right">
-                  <Link href="/" className="text-gray-700 hover:text-gray-900 font-semibold">خانه</Link>
-                  <Link href="/registration" className="text-gray-700 hover:text-gray-900 font-semibold">ثبت نام</Link>
-                  <Link href="/interduction" className="text-gray-700 hover:text-gray-900 font-semibold">معرفی هنرستان</Link>
-                  <Link href="/contact" className="text-gray-700 hover:text-gray-900 font-semibold">تماس با ما</Link>
-                </nav>
-              </motion.div>
-            )}
-          </AnimatePresence>
+  {menuOpen && (
+    <motion.div
+      initial={{ x: '100%' }}
+      animate={{ x: 0 }}
+      exit={{ x: '100%' }}
+      transition={{ duration: 0.28 }}
+      // wrapper: full-screen fixed so no horizontal gap appears
+      className="fixed inset-0 z-50 flex justify-end"
+      aria-modal="true"
+      role="dialog"
+    >
+      {/* backdrop (prevents seeing underlying page and provides dim) */}
+      <div
+        className="absolute inset-0 bg-black/40"
+        onClick={() => setMenuOpen(false)}
+        aria-hidden
+      />
+
+      {/* side panel */}
+      <motion.div
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ duration: 0.28 }}
+        className="relative w-full max-w-xs h-full bg-white shadow-2xl p-5 overflow-y-auto"
+      >
+        <button
+          className="text-gray-800 absolute top-4 left-4 p-2 rounded-md hover:bg-gray-100"
+          onClick={() => setMenuOpen(false)}
+          aria-label="بستن منو"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <nav className="pt-12 flex flex-col space-y-4 text-right">
+          <Link href="/" className="text-gray-900 hover:text-blue-600 font-semibold">خانه</Link>
+          <Link href="/registration" className="text-gray-900 hover:text-blue-600 font-semibold">ثبت نام</Link>
+          <Link href="/interduction" className="text-gray-900 hover:text-blue-600 font-semibold">معرفی هنرستان</Link>
+          <Link href="/contact" className="text-gray-900 hover:text-blue-600 font-semibold">تماس با ما</Link>
+        </nav>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
         </header>
 
         {/* Main */}

@@ -100,7 +100,7 @@ export default function HomeClient({ pages, majors }) {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group block rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition bg-white relative"
+              className="group block rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition bg-white text-black relative"
             >
               {m.cover ? (
                 <img

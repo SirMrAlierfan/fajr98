@@ -10,7 +10,6 @@ export default function SearchBox() {
   const [filteredPages, setFilteredPages] = useState([]);
   const [filteredMajors, setFilteredMajors] = useState([]);
 
-  // فقط یکبار همه داده‌ها رو بگیر
   useEffect(() => {
     async function fetchData() {
       try {
@@ -27,14 +26,12 @@ export default function SearchBox() {
     fetchData();
   }, []);
 
-  // فیلتر روی داده‌ها
   useEffect(() => {
     if (query.trim() === "") {
       setFilteredPages([]);
       setFilteredMajors([]);
       return;
     }
-
     const q = query.toLowerCase();
 
     setFilteredPages(
@@ -57,15 +54,17 @@ export default function SearchBox() {
         placeholder="جستجو کنید..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right"
+        className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right text-gray-900 placeholder:text-gray-500"
       />
 
       {(filteredPages.length > 0 || filteredMajors.length > 0) && (
-        <div className="absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg text-right max-h-72 overflow-y-auto">
+        <div className="absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg text-right max-h-72 overflow-y-auto text-gray-900">
           {/* صفحات */}
           {filteredPages.length > 0 && (
             <div className="border-b border-gray-200">
-              <h3 className="px-4 py-2 text-sm font-bold text-gray-600">📄 صفحات</h3>
+              <h3 className="px-4 py-2 text-sm font-bold text-gray-800">
+                📄 صفحات
+              </h3>
               <ul>
                 {filteredPages.map((item, index) => (
                   <li
@@ -83,7 +82,9 @@ export default function SearchBox() {
           {/* رشته‌ها */}
           {filteredMajors.length > 0 && (
             <div>
-              <h3 className="px-4 py-2 text-sm font-bold text-gray-600">🎓 رشته‌ها</h3>
+              <h3 className="px-4 py-2 text-sm font-bold text-gray-800">
+                🎓 رشته‌ها
+              </h3>
               <ul>
                 {filteredMajors.map((item, index) => (
                   <li
