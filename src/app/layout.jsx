@@ -147,7 +147,7 @@ export default function RootLayout({ children }) {
       exit={{ x: '100%' }}
       transition={{ duration: 0.28 }}
       // wrapper: full-screen fixed so no horizontal gap appears
-      className="fixed inset-0 z-50 flex justify-end"
+      className="fixed right-0 top-0 h-full w-72 max-w-[60%] z-50 flex justify-end"
       aria-modal="true"
       role="dialog"
     >
