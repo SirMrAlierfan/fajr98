@@ -194,7 +194,7 @@ export default function RootLayout({ children }) {
         <footer className="bg-gray-200 text-gray-800 mt-8 rounded-t-xl">
           <div className="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-8 text-center md:text-right">
 
-            <div className='mr-7'>
+            <div className='mr-7 text-center'>
               <h2 className="text-lg font-bold mb-3 ">هنرستان فنی فجر</h2>
               <img
                 src="https://static.cdn.asset.aparat.com/profile-photo/11793628-761313-m.jpg"
