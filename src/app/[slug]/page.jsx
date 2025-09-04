@@ -138,7 +138,7 @@ function GlobalStyles() {
   .soft-bg { position:relative; }
   .soft-bg::before{
     content:"";
-    position:absolute; inset:-10%;
+    position:absolute; inset:0%;
     background:
       radial-gradient(60rem 60rem at 10% -10%, rgba(124,58,237,.06), transparent 60%),
       radial-gradient(40rem 40rem at 100% 20%, rgba(59,130,246,.05), transparent 70%),

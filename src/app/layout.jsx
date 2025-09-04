@@ -192,45 +192,60 @@ export default function RootLayout({ children }) {
 
         {/* Footer مینیمال خاکستری */}
         <footer className="bg-gray-200 text-gray-800 mt-8 rounded-t-xl">
-          <div className="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-8 text-center md:text-right">
+  <div className="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-8 text-center md:text-right">
+    
+    {/* بخش لوگو و معرفی */}
+    <div className="flex flex-col items-center md:items-start space-y-3">
+      <img
+        src="https://static.cdn.asset.aparat.com/profile-photo/11793628-761313-m.jpg"
+        alt="لوگو"
+        className="w-24 h-24 rounded-full hover:scale-105 transition-transform duration-300 shadow-md"
+      />
+      <h2 className="text-lg font-bold">هنرستان فنی فجر</h2>
+      <p className="text-sm leading-6 text-gray-600">
+        بهترین هنرستان فنی حرفه‌ای برای موفقیت شما.
+      </p>
+    </div>
 
-            <div className='mr-7 text-center'>
-              <h2 className="text-lg font-bold mb-3 ">هنرستان فنی فجر</h2>
-              <img
-                src="https://static.cdn.asset.aparat.com/profile-photo/11793628-761313-m.jpg"
-                alt="لوگو"
-                className="w-30 h-30 rounded-full hover:scale-105 transition-transform duration-300"
-              />
-            </div>
+    {/* بخش لینک‌ها */}
+    <div>
+      <h3 className="font-bold mb-3">لینک‌های سریع</h3>
+      <ul className="space-y-2 text-sm">
+        <li><Link href="/" className="hover:underline">خانه</Link></li>
+        <li><Link href="/registration" className="hover:underline">ثبت نام</Link></li>
+        <li><Link href="/interduction" className="hover:underline">معرفی هنرستان</Link></li>
+        <li><Link href="/contact" className="hover:underline">تماس با ما</Link></li>
+      </ul>
+    </div>
 
-            <div>
-              <h3 className="font-bold mb-3">لینک‌های سریع</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/" className="hover:underline">خانه</Link></li>
-                <li><Link href="/registration" className="hover:underline">ثبت نام</Link></li>
-                <li><Link href="/interduction" className="hover:underline">معرفی هنرستان</Link></li>
-                <li><Link href="/contact" className="hover:underline">تماس با ما</Link></li>
-              </ul>
-            </div>
+    {/* بخش تماس و شبکه‌ها */}
+    <div>
+      <h3 className="font-bold mb-3">ارتباط با ما</h3>
+      <p className="text-sm flex items-center justify-center md:justify-start gap-2">
+        📍 تهران، خیابان فرجام، خیابان سراج، کوچه محمودی (معاینه فنی)
+      </p>
+      <p className="text-sm mt-2 flex items-center justify-center md:justify-start gap-2">
+        📞 ۷۷۰۶۷۱۷۵ - ۷۷۰۶۷۱۷۸
+      </p>
 
-            <div>
-              <h3 className="font-bold mb-3">شبکه‌های اجتماعی</h3>
-              <div className="flex justify-center md:justify-start gap-4 text-gray-700">
-                <Link href="#"><FaTelegramPlane size={20} /></Link>
+      <h3 className="font-bold mt-4 mb-2">شبکه‌های اجتماعی</h3>
+      <div className="flex justify-center md:justify-start gap-4 text-gray-700">
+        <Link href="#"><FaTelegramPlane size={20} /></Link>
+        <Link href="https://www.aparat.com/honarestanfajr">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="20px" height="20px" viewBox="0 0 24 24" role="img">
+            <path d="M12.001 1.594c-9.27-.003-13.913 11.203-7.36 17.758a10.403 10.403 0 0 0 17.76-7.355c0-5.744-4.655-10.401-10.4-10.403zM6.11 6.783c.501-2.598 3.893-3.294 5.376-1.103 1.483 2.19-.422 5.082-3.02 4.582A2.97 2.97 0 0 1 6.11 6.783zm4.322 8.988c-.504 2.597-3.897 3.288-5.377 1.096-1.48-2.192.427-5.08 3.025-4.579a2.97 2.97 0 0 1 2.352 3.483zm1.26-2.405c-1.152-.223-1.462-1.727-.491-2.387.97-.66 2.256.18 2.04 1.334a1.32 1.32 0 0 1-1.548 1.053zm6.198 3.838c-.501 2.598-3.893 3.293-5.376 1.103-1.484-2.191.421-5.082 3.02-4.583a2.97 2.97 0 0 1 2.356 3.48zm-1.967-5.502c-2.598-.501-3.293-3.896-1.102-5.38 2.19-1.483 5.081.422 4.582 3.02a2.97 2.97 0 0 1-3.48 2.36zM13.59 23.264l2.264.61a3.715 3.715 0 0 0 4.543-2.636l.64-2.402a11.383 11.383 0 0 1-7.448 4.428zm7.643-19.665L18.87 2.97a11.376 11.376 0 0 1 4.354 7.62l.65-2.459A3.715 3.715 0 0 0 21.231 3.6zM.672 13.809l-.541 2.04a3.715 3.715 0 0 0 2.636 4.543l2.107.562a11.38 11.38 0 0 1-4.203-7.145zM10.357.702 8.15.126a3.715 3.715 0 0 0-4.547 2.637l-.551 2.082A11.376 11.376 0 0 1 10.358.702z" />
+          </svg>
+        </Link>
+        <Link href="https://github.com/SirMrAlierfan"><FaGithub size={20} /></Link>
+      </div>
+    </div>
+  </div>
 
-                <Link href="https://www.aparat.com/honarestanfajr"><svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="20px" height="20px" viewBox="0 0 24 24" role="img"><path d="M12.001 1.594c-9.27-.003-13.913 11.203-7.36 17.758a10.403 10.403 0 0 0 17.76-7.355c0-5.744-4.655-10.401-10.4-10.403zM6.11 6.783c.501-2.598 3.893-3.294 5.376-1.103 1.483 2.19-.422 5.082-3.02 4.582A2.97 2.97 0 0 1 6.11 6.783zm4.322 8.988c-.504 2.597-3.897 3.288-5.377 1.096-1.48-2.192.427-5.08 3.025-4.579a2.97 2.97 0 0 1 2.352 3.483zm1.26-2.405c-1.152-.223-1.462-1.727-.491-2.387.97-.66 2.256.18 2.04 1.334a1.32 1.32 0 0 1-1.548 1.053zm6.198 3.838c-.501 2.598-3.893 3.293-5.376 1.103-1.484-2.191.421-5.082 3.02-4.583a2.97 2.97 0 0 1 2.356 3.48zm-1.967-5.502c-2.598-.501-3.293-3.896-1.102-5.38 2.19-1.483 5.081.422 4.582 3.02a2.97 2.97 0 0 1-3.48 2.36zM13.59 23.264l2.264.61a3.715 3.715 0 0 0 4.543-2.636l.64-2.402a11.383 11.383 0 0 1-7.448 4.428zm7.643-19.665L18.87 2.97a11.376 11.376 0 0 1 4.354 7.62l.65-2.459A3.715 3.715 0 0 0 21.231 3.6zM.672 13.809l-.541 2.04a3.715 3.715 0 0 0 2.636 4.543l2.107.562a11.38 11.38 0 0 1-4.203-7.145zM10.357.702 8.15.126a3.715 3.715 0 0 0-4.547 2.637l-.551 2.082A11.376 11.376 0 0 1 10.358.702z" /></svg></Link>
-                <Link href="https://github.com/SirMrAlierfan"><FaGithub size={20} /></Link>
+  <div className="bg-gray-300 text-center py-3 text-xs rounded-t-xl">
+    © {new Date().getFullYear()} هنرستان فنی فجر. تمامی حقوق محفوظ است.
+  </div>
+</footer>
 
-              </div>
-              <p className="text-sm mt-3">📞 021-12345678</p>
-
-            </div>
-          </div>
-
-          <div className="bg-gray-300 text-center py-3 text-xs rounded-t-xl">
-            © {new Date().getFullYear()} هنرستان فنی فجر. تمامی حقوق محفوظ است.
-          </div>
-        </footer>
       </body>
     </html>
   );
