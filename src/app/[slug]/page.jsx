@@ -512,7 +512,7 @@ export async function generateMetadata({ params }) {
         images: cover ? [cover] : undefined,
       },
       alternates: {
-        canonical: `/${page.slug || slug}`,
+        canonical: `https://fajr98.ir/${page.slug || slug}`,
       },
     };
   } catch (err) {

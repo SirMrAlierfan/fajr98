@@ -494,7 +494,7 @@ export async function generateMetadata({ params }) {
         images: cover ? [cover] : undefined,
       },
       alternates: {
-        canonical: `/majors/${major.slug || slug}`,
+        canonical: `https://fajr98.ir/majors/${major.slug || slug}`,
       },
     };
   } catch (err) {

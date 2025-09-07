@@ -1,0 +1,12 @@
+# robots.txt
+
+User-agent: *
+Disallow: /admin/
+Disallow: /login/
+Disallow: /profile/
+Disallow: /cart/
+Disallow: /checkout/
+Allow: /
+
+
+Sitemap: https://fajr98.ir/sitemap.xml
